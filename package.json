@@ -4,9 +4,9 @@
   "version": "1.0.0",
   "type": "module",
   "scripts": {
-    "dev": "vite",
-    "build": "vite build",
-    "preview": "vite preview"
+    "dev": "npx --no-install vite",
+    "build": "npx --no-install vite build",
+    "preview": "npx --no-install vite preview"
   },
   "dependencies": {
     "lucide-react": "^1.16.0",
