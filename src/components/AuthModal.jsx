@@ -1,21 +1,47 @@
 import React, { useState } from 'react';
-import { X, User, Lock, Mail, ArrowRight } from 'lucide-react';
+import { X, User, Lock, Mail, AlertCircle, Loader2 } from 'lucide-react';
+import { login, signup } from '../data/store';
 
 export default function AuthModal({ isOpen, onClose, onAuthSuccess }) {
   const [tab, setTab] = useState('login'); // 'login' | 'signup'
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [error, setError] = useState('');
+  const [loading, setLoading] = useState(false);
 
   if (!isOpen) return null;
 
-  const handleSubmit = (e) => {
+  const handleTabChange = (newTab) => {
+    setTab(newTab);
+    setError('');
+  };
+
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    onAuthSuccess({
-      tab,
-      name: name || 'أحمد يوسف'
-    });
-    onClose();
+    setError('');
+    setLoading(true);
+
+    try {
+      if (tab === 'signup') {
+        if (!name.trim()) {
+          setError('يرجى إدخال الاسم');
+          setLoading(false);
+          return;
+        }
+        const res = await signup({ name, email, password });
+        onAuthSuccess(res.user, 'signup');
+        onClose();
+      } else {
+        const res = await login({ email, password });
+        onAuthSuccess(res.user, 'login');
+        onClose();
+      }
+    } catch (err) {
+      setError(err.message || 'حدث خطأ أثناء المحاولة، يرجى إعادة المحاولة');
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -49,7 +75,7 @@ export default function AuthModal({ isOpen, onClose, onAuthSuccess }) {
         <div className="flex border-b border-[#E2D2BC] mb-6">
           <button
             type="button"
-            onClick={() => setTab('login')}
+            onClick={() => handleTabChange('login')}
             className={`flex-1 pb-2.5 text-sm font-semibold transition-colors border-b-2 ${
               tab === 'login'
                 ? 'border-[#BD4444] text-[#BD4444]'
@@ -60,7 +86,7 @@ export default function AuthModal({ isOpen, onClose, onAuthSuccess }) {
           </button>
           <button
             type="button"
-            onClick={() => setTab('signup')}
+            onClick={() => handleTabChange('signup')}
             className={`flex-1 pb-2.5 text-sm font-semibold transition-colors border-b-2 ${
               tab === 'signup'
                 ? 'border-[#BD4444] text-[#BD4444]'
@@ -70,6 +96,14 @@ export default function AuthModal({ isOpen, onClose, onAuthSuccess }) {
             حساب جديد
           </button>
         </div>
+
+        {/* Error Alert */}
+        {error && (
+          <div className="mb-4 p-3 bg-[#BD4444]/10 border border-[#BD4444]/30 rounded-xl flex items-center gap-2 text-xs text-[#BD4444] font-medium">
+            <AlertCircle className="w-4 h-4 shrink-0" />
+            <span>{error}</span>
+          </div>
+        )}
 
         {/* Form */}
         <form onSubmit={handleSubmit} className="space-y-4">
@@ -129,9 +163,11 @@ export default function AuthModal({ isOpen, onClose, onAuthSuccess }) {
           <div className="pt-2">
             <button
               type="submit"
-              className="w-full bg-[#BD4444] hover:bg-[#A43939] text-[#FDF8F0] font-semibold py-2.5 px-4 rounded-xl transition-colors shadow-sm focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-[#BD4444]"
+              disabled={loading}
+              className="w-full bg-[#BD4444] hover:bg-[#A43939] text-[#FDF8F0] font-semibold py-2.5 px-4 rounded-xl transition-colors shadow-sm focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-[#BD4444] flex items-center justify-center gap-2"
             >
-              {tab === 'login' ? 'دخول' : 'إنشاء حساب'}
+              {loading && <Loader2 className="w-4 h-4 animate-spin" />}
+              <span>{tab === 'login' ? 'دخول' : 'إنشاء حساب'}</span>
             </button>
           </div>
         </form>

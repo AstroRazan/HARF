@@ -529,7 +529,7 @@ function BookshelfIllustration() {
   );
 }
 
-export default function HomePage({ setView, onOpenAuth }) {
+export default function HomePage({ setView, onOpenAuth, currentUser }) {
   const [mostDiscussed, setMostDiscussed] = useState([]);
   const [newestBooks, setNewestBooks] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -588,10 +588,16 @@ export default function HomePage({ setView, onOpenAuth }) {
               {/* Action Buttons: Exactly 52px tall with rich press/hover states */}
               <div className="pt-2 flex flex-wrap items-center gap-4">
                 <button
-                  onClick={onOpenAuth}
+                  onClick={() => {
+                    if (currentUser) {
+                      setView({ name: 'my-library' });
+                    } else {
+                      onOpenAuth();
+                    }
+                  }}
                   className="h-[52px] px-9 bg-[#BD4444] hover:bg-[#A43939] active:bg-[#912F2F] text-[#FDF8F0] font-semibold text-base rounded-xl transition-all duration-200 shadow-sm hover:shadow-md hover:-translate-y-0.5 active:translate-y-0 active:scale-[0.98] focus-visible:ring-2 focus-visible:ring-[#BD4444] inline-flex items-center justify-center"
                 >
-                  أنشئ حسابك
+                  {currentUser ? 'مكتبتي الشخصية' : 'أنشئ حسابك'}
                 </button>
 
                 <button

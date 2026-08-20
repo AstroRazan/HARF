@@ -8,7 +8,7 @@ import { toArabicDigits } from '../utils/formatters';
 
 const CATEGORIES = ['الكل', ...INITIAL_CATEGORIES, 'إنجليزي'];
 
-export default function LibraryPage({ setView, showToast }) {
+export default function LibraryPage({ setView, showToast, currentUser, onOpenAuth }) {
   const [books, setBooks] = useState([]);
   const [selectedCategory, setSelectedCategory] = useState('الكل');
   const [searchQuery, setSearchQuery] = useState('');
@@ -19,7 +19,7 @@ export default function LibraryPage({ setView, showToast }) {
     setLoading(true);
     const [allBooks, myLib] = await Promise.all([
       getBooks({ category: selectedCategory, search: searchQuery }),
-      getMyLibrary()
+      getMyLibrary(currentUser ? currentUser.id : null)
     ]);
     setBooks(allBooks);
     setLibraryBookIds(new Set(myLib.map((entry) => entry.bookId)));
@@ -28,11 +28,15 @@ export default function LibraryPage({ setView, showToast }) {
 
   useEffect(() => {
     loadData();
-  }, [selectedCategory, searchQuery]);
+  }, [selectedCategory, searchQuery, currentUser]);
 
   const handleAddBook = async (e, bookId) => {
     e.stopPropagation();
-    await addToLibrary(bookId, 'want');
+    if (!currentUser) {
+      onOpenAuth();
+      return;
+    }
+    await addToLibrary(bookId, 'want', currentUser);
     showToast('تمت الإضافة لمكتبتك');
     setLibraryBookIds((prev) => new Set([...prev, bookId]));
   };

@@ -10,13 +10,13 @@ import BookDetailPage from './pages/BookDetailPage';
 import LibraryPage from './pages/LibraryPage';
 import MyLibraryPage from './pages/MyLibraryPage';
 import CommunitiesPage from './pages/CommunitiesPage';
-import { getSessionUser } from './data/store';
+import { getSessionUser, logout } from './data/store';
 
 export default function App() {
   // Navigation view state (no routing library)
   const [view, setView] = useState({ name: 'home' });
 
-  // Auth modal & session state
+  // Auth modal & session state (starts signed out)
   const [isAuthOpen, setIsAuthOpen] = useState(false);
   const [currentUser, setCurrentUser] = useState(null);
 
@@ -40,12 +40,15 @@ export default function App() {
     }, 3000);
   };
 
-  const handleAuthSuccess = ({ tab, name }) => {
-    showToast('تم تسجيل الدخول بنجاح');
-    setCurrentUser((prev) => ({
-      ...(prev || {}),
-      name: name || 'أحمد يوسف'
-    }));
+  const handleAuthSuccess = (user, type = 'login') => {
+    setCurrentUser(user);
+    showToast(type === 'signup' ? 'تم إنشاء الحساب بنجاح' : 'تم تسجيل الدخول بنجاح');
+  };
+
+  const handleLogout = async () => {
+    await logout();
+    setCurrentUser(null);
+    showToast('تم تسجيل الخروج بنجاح');
   };
 
   // Scroll to top on view change
@@ -55,23 +58,25 @@ export default function App() {
 
   return (
     <div className="min-h-screen bg-[#FDF8F0] text-[#2B2B26] flex flex-col w-full">
-      {/* 1. Dismissible Top Banner (Full-bleed with max-w-7xl inner container) */}
+      {/* 1. Slim Top Banner */}
       <TopBanner />
 
-      {/* 2. Top Bar & Wordmark (Full-bleed with max-w-7xl inner container) */}
+      {/* 2. Top Bar & Wordmark */}
       <Navbar
         currentView={view}
         setView={setView}
         onOpenAuth={() => setIsAuthOpen(true)}
+        onLogout={handleLogout}
         currentUser={currentUser}
       />
 
-      {/* 3. Page Body (Full-bleed container with max-w-7xl centered content) */}
+      {/* 3. Page Body */}
       <main className="flex-1 w-full pb-16 md:pb-8">
         {view.name === 'home' && (
           <HomePage
             setView={setView}
             onOpenAuth={() => setIsAuthOpen(true)}
+            currentUser={currentUser}
           />
         )}
 
@@ -82,6 +87,8 @@ export default function App() {
                 bookId={view.bookId}
                 setView={setView}
                 showToast={showToast}
+                currentUser={currentUser}
+                onOpenAuth={() => setIsAuthOpen(true)}
               />
             )}
 
@@ -89,6 +96,8 @@ export default function App() {
               <LibraryPage
                 setView={setView}
                 showToast={showToast}
+                currentUser={currentUser}
+                onOpenAuth={() => setIsAuthOpen(true)}
               />
             )}
 
@@ -96,6 +105,8 @@ export default function App() {
               <MyLibraryPage
                 setView={setView}
                 showToast={showToast}
+                currentUser={currentUser}
+                onOpenAuth={() => setIsAuthOpen(true)}
               />
             )}
 
@@ -103,6 +114,8 @@ export default function App() {
               <CommunitiesPage
                 setView={setView}
                 showToast={showToast}
+                currentUser={currentUser}
+                onOpenAuth={() => setIsAuthOpen(true)}
               />
             )}
           </div>

@@ -24,7 +24,7 @@ import {
 import BookCover from '../components/BookCover';
 import { toArabicDigits, formatDateArabic } from '../utils/formatters';
 
-export default function CommunitiesPage({ setView, showToast }) {
+export default function CommunitiesPage({ setView, showToast, currentUser, onOpenAuth }) {
   const [communities, setCommunities] = useState([]);
   const [selectedCategory, setSelectedCategory] = useState('تاريخ');
   const [posts, setPosts] = useState([]);
@@ -73,7 +73,7 @@ export default function CommunitiesPage({ setView, showToast }) {
 
   useEffect(() => {
     loadData();
-  }, [selectedCategory]);
+  }, [selectedCategory, currentUser]);
 
   const handleSelectCommunity = (cat) => {
     setSelectedCategory(cat);
@@ -81,14 +81,21 @@ export default function CommunitiesPage({ setView, showToast }) {
 
   const handlePublishRecommendation = async (e) => {
     e.preventDefault();
+    if (!currentUser) {
+      onOpenAuth();
+      return;
+    }
     if (!selectedBookId || !recommendationReason.trim()) return;
 
     setSubmittingPost(true);
-    await addPost({
-      category: selectedCategory,
-      bookId: selectedBookId,
-      reason: recommendationReason
-    });
+    await addPost(
+      {
+        category: selectedCategory,
+        bookId: selectedBookId,
+        reason: recommendationReason
+      },
+      currentUser
+    );
     setSubmittingPost(false);
     setRecommendationReason('');
     showToast('تم النشر');
@@ -98,7 +105,11 @@ export default function CommunitiesPage({ setView, showToast }) {
   };
 
   const handleToggleLike = async (postId) => {
-    await togglePostLike(postId);
+    if (!currentUser) {
+      onOpenAuth();
+      return;
+    }
+    await togglePostLike(postId, currentUser);
     showToast('تم الإعجاب');
     const updated = await getPosts(selectedCategory);
     setPosts(updated);
@@ -114,7 +125,11 @@ export default function CommunitiesPage({ setView, showToast }) {
   const handleAddComment = async (postId) => {
     const text = (commentInputs[postId] || '').trim();
     if (!text) return;
-    await addPostComment(postId, text);
+    if (!currentUser) {
+      onOpenAuth();
+      return;
+    }
+    await addPostComment(postId, text, currentUser);
     setCommentInputs((prev) => ({ ...prev, [postId]: '' }));
     showToast('تم النشر');
     const updated = await getPosts(selectedCategory);
@@ -122,8 +137,12 @@ export default function CommunitiesPage({ setView, showToast }) {
   };
 
   const handleJoinSession = async () => {
+    if (!currentUser) {
+      onOpenAuth();
+      return;
+    }
     const userBook = allBooks.find((b) => b.id === selectedBookId)?.title || 'مقدمة ابن خلدون';
-    const updatedSession = await joinLiveSession(userBook);
+    const updatedSession = await joinLiveSession(userBook, currentUser);
     setLiveSession(updatedSession);
     showToast('انضممت إلى جلسة القراءة');
   };

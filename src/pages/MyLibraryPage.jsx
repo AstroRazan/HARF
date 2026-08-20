@@ -1,18 +1,27 @@
 import React, { useState, useEffect } from 'react';
-import { CheckCircle2, Play, BookOpen, Flame, ArrowLeft } from 'lucide-react';
-import { getMyLibrary, addToLibrary, updateProgress } from '../data/store';
+import { CheckCircle2, Play, BookOpen, Flame, ArrowLeft, LogIn } from 'lucide-react';
+import { getMyLibrary, addToLibrary, updateProgress, getUserStats } from '../data/store';
 import BookCover from '../components/BookCover';
 import { toArabicDigits, formatDateArabic } from '../utils/formatters';
 
-export default function MyLibraryPage({ setView, showToast }) {
+export default function MyLibraryPage({ setView, showToast, currentUser, onOpenAuth }) {
   const [libraryEntries, setLibraryEntries] = useState([]);
+  const [userStats, setUserStats] = useState({ finishedCount: 0, streakDays: 0, streakWeek: [false, false, false, false, false, false, false] });
   const [loading, setLoading] = useState(true);
   const [pageInputs, setPageInputs] = useState({});
 
   const loadLibrary = async () => {
+    if (!currentUser) {
+      setLoading(false);
+      return;
+    }
     setLoading(true);
-    const data = await getMyLibrary();
+    const [data, stats] = await Promise.all([
+      getMyLibrary(currentUser.id),
+      getUserStats(currentUser.id)
+    ]);
     setLibraryEntries(data);
+    setUserStats(stats);
 
     // Initialize inputs
     const inputs = {};
@@ -25,18 +34,16 @@ export default function MyLibraryPage({ setView, showToast }) {
 
   useEffect(() => {
     loadLibrary();
-  }, []);
+  }, [currentUser]);
 
-  // Compute stats
-  const finishedCount = libraryEntries.filter((e) => e.status === 'finished').length;
-  const streakDays = 14; // Mock 14-day streak
-
-  // 7-day active streak dots (e.g., last 7 days: 6 active, today active)
-  const streakWeek = [true, true, true, false, true, true, true];
   const dayNames = ['س', 'ح', 'ن', 'ث', 'ر', 'خ', 'ج'];
 
   const handleStartReading = async (bookId) => {
-    await addToLibrary(bookId, 'reading');
+    if (!currentUser) {
+      onOpenAuth();
+      return;
+    }
+    await addToLibrary(bookId, 'reading', currentUser);
     showToast('تم البدء في قراءة الكتاب');
     loadLibrary();
   };
@@ -49,9 +56,13 @@ export default function MyLibraryPage({ setView, showToast }) {
   };
 
   const handleSaveProgress = async (bookId, totalPages) => {
+    if (!currentUser) {
+      onOpenAuth();
+      return;
+    }
     const pageNum = Number(pageInputs[bookId]) || 0;
     const finalPage = Math.min(Math.max(0, pageNum), totalPages);
-    await updateProgress(bookId, finalPage);
+    await updateProgress(bookId, finalPage, currentUser);
     if (finalPage >= totalPages) {
       showToast('تهانينا! أتممت قراءة الكتاب');
     } else {
@@ -59,6 +70,32 @@ export default function MyLibraryPage({ setView, showToast }) {
     }
     loadLibrary();
   };
+
+  // Signed out empty state
+  if (!currentUser) {
+    return (
+      <div className="bg-[#FDF8F0] border border-[#E2D2BC] rounded-card p-12 text-center max-w-lg mx-auto space-y-4 my-8 shadow-xs">
+        <div className="w-16 h-16 rounded-full bg-[#F1DEC4] flex items-center justify-center mx-auto text-[#73976A]">
+          <BookOpen className="w-8 h-8" />
+        </div>
+        <h2 className="text-xl font-bold font-serif text-[#2B2B26]">
+          مكتبتك الشخصية
+        </h2>
+        <p className="text-sm text-[#7A7468] leading-relaxed">
+          سجّل دخولك للوصول إلى مكتبتك الخاصة، ومتابعة تقدم قراءاتك، وبناء سلسلة القراءة اليومية.
+        </p>
+        <div className="pt-2">
+          <button
+            onClick={onOpenAuth}
+            className="inline-flex items-center gap-2 text-sm font-semibold py-2.5 px-6 rounded-xl bg-[#BD4444] hover:bg-[#A43939] text-[#FDF8F0] transition-colors shadow-2xs"
+          >
+            <LogIn className="w-4 h-4" />
+            <span>تسجيل الدخول / حساب جديد</span>
+          </button>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-8">
@@ -71,7 +108,7 @@ export default function MyLibraryPage({ setView, showToast }) {
               الكتب المكتملة
             </span>
             <div className="text-3xl sm:text-4xl font-bold font-serif text-[#73976A]">
-              {toArabicDigits(finishedCount)}
+              {toArabicDigits(userStats.finishedCount)}
             </div>
             <span className="text-[11px] text-[#7A7468] mt-1 block">
               كتاب تم إنهاؤه
@@ -84,13 +121,13 @@ export default function MyLibraryPage({ setView, showToast }) {
               سلسلة القراءة
             </span>
             <div className="flex items-center justify-center gap-1.5 text-3xl sm:text-4xl font-bold font-serif text-[#BD4444]">
-              <span>{toArabicDigits(streakDays)}</span>
+              <span>{toArabicDigits(userStats.streakDays)}</span>
               <span className="text-sm font-sans font-medium text-[#7A7468]">يومًا</span>
             </div>
 
             {/* 7-day dot row */}
             <div className="flex items-center justify-center gap-2 mt-2" dir="rtl">
-              {streakWeek.map((active, i) => (
+              {userStats.streakWeek.map((active, i) => (
                 <div key={i} className="flex flex-col items-center gap-1">
                   <div
                     className={`w-2.5 h-2.5 rounded-full transition-all ${
@@ -131,17 +168,15 @@ export default function MyLibraryPage({ setView, showToast }) {
 
             const totalPages = book.pages || 100;
             const currentPage = entry.currentPage || 0;
-            const progressPercent = Math.min(
-              100,
-              Math.round((currentPage / totalPages) * 100)
-            );
+            const progressPercent = Math.min(100, Math.round((currentPage / totalPages) * 100));
 
             return (
               <div
                 key={entry.bookId}
                 className="bg-[#FDF8F0] border border-[#E2D2BC] rounded-card p-4 flex flex-col justify-between space-y-4 hover:border-[#BD4444]/40 transition-colors"
               >
-                <div className="flex gap-3.5 items-start">
+                {/* Book Header info */}
+                <div className="flex gap-3">
                   {/* Small Cover */}
                   <div
                     className="shrink-0 cursor-pointer"
@@ -184,55 +219,57 @@ export default function MyLibraryPage({ setView, showToast }) {
                   {/* STATE 1: Want to read */}
                   {entry.status === 'want' && (
                     <div className="flex items-center justify-between">
-                      <span className="text-xs text-[#7A7468]">في قائمة الرغبات</span>
+                      <span className="text-xs text-[#7A7468]">في قائمة القراءة</span>
                       <button
-                        onClick={() => handleStartReading(book.id)}
-                        className="bg-[#BD4444] hover:bg-[#A43939] text-[#FDF8F0] text-xs font-semibold px-3 py-1.5 rounded-lg transition-colors flex items-center gap-1"
+                        onClick={() => handleStartReading(entry.bookId)}
+                        className="text-xs font-semibold py-1.5 px-3 rounded-lg bg-[#677E61] hover:bg-[#52664d] text-[#FDF8F0] flex items-center gap-1.5 transition-colors shadow-2xs"
                       >
                         <Play className="w-3 h-3 fill-current" />
-                        <span>ابدأ القراءة</span>
+                        <span>بدء القراءة</span>
                       </button>
                     </div>
                   )}
 
-                  {/* STATE 2: Reading with progress bar and page input */}
+                  {/* STATE 2: Currently Reading */}
                   {entry.status === 'reading' && (
-                    <div className="space-y-2.5">
-                      <div className="flex items-center justify-between text-xs">
-                        <span className="text-[#7A7468]">
-                          {toArabicDigits(currentPage)} من {toArabicDigits(totalPages)} صفحة
-                        </span>
-                        <span className="font-semibold text-[#BD4444]">
-                          {toArabicDigits(progressPercent)}٪
-                        </span>
+                    <div className="space-y-3">
+                      {/* Bar & % */}
+                      <div className="space-y-1">
+                        <div className="flex justify-between text-xs text-[#7A7468]">
+                          <span>التقدم</span>
+                          <span className="font-semibold text-[#2B2B26]">
+                            {toArabicDigits(progressPercent)}٪
+                          </span>
+                        </div>
+                        <div className="w-full h-2 bg-[#F1DEC4] rounded-full overflow-hidden">
+                          <div
+                            className="h-full bg-[#BD4444] rounded-full transition-all duration-300"
+                            style={{ width: `${progressPercent}%` }}
+                          />
+                        </div>
                       </div>
 
-                      {/* Thin Progress Bar: Accent red fill on sand track */}
-                      <div className="w-full h-1.5 bg-[#F1DEC4] rounded-full overflow-hidden">
-                        <div
-                          className="h-full bg-[#BD4444] rounded-full transition-all duration-300"
-                          style={{ width: `${progressPercent}%` }}
-                        />
-                      </div>
-
-                      {/* Quick page updater */}
+                      {/* Inline Page Update Form */}
                       <div className="flex items-center gap-2 pt-1">
-                        <label className="text-[11px] text-[#7A7468] shrink-0">
-                          الصفحة الحالية:
-                        </label>
+                        <span className="text-xs text-[#7A7468]">الصفحة:</span>
                         <input
                           type="number"
-                          min={0}
+                          min="0"
                           max={totalPages}
-                          value={pageInputs[book.id] ?? currentPage}
-                          onChange={(e) => handlePageInputChange(book.id, e.target.value)}
-                          className="w-20 bg-[#FDF8F0] border border-[#E2D2BC] rounded-lg px-2 py-1 text-xs text-center font-medium text-[#2B2B26] focus:border-[#677E61] focus:ring-1 focus:ring-[#677E61]"
+                          value={pageInputs[entry.bookId] ?? currentPage}
+                          onChange={(e) =>
+                            handlePageInputChange(entry.bookId, e.target.value)
+                          }
+                          className="w-16 bg-[#FDF8F0] border border-[#E2D2BC] rounded-lg px-2 py-1 text-xs text-center text-[#2B2B26] focus:border-[#677E61] focus:ring-1 focus:ring-[#677E61]"
                         />
+                        <span className="text-xs text-[#7A7468]">
+                          من {toArabicDigits(totalPages)}
+                        </span>
                         <button
-                          onClick={() => handleSaveProgress(book.id, totalPages)}
-                          className="text-xs font-medium bg-[#F1DEC4] hover:bg-[#E2D2BC] text-[#2B2B26] px-2.5 py-1 rounded-lg transition-colors"
+                          onClick={() => handleSaveProgress(entry.bookId, totalPages)}
+                          className="mr-auto text-xs font-medium py-1 px-3 rounded-lg bg-[#FDF8F0] border border-[#E2D2BC] hover:bg-[#F1DEC4] text-[#2B2B26] transition-colors"
                         >
-                          تحديث
+                          حفظ
                         </button>
                       </div>
                     </div>
@@ -240,16 +277,23 @@ export default function MyLibraryPage({ setView, showToast }) {
 
                   {/* STATE 3: Finished */}
                   {entry.status === 'finished' && (
-                    <div className="flex items-center justify-between">
-                      <div className="flex items-center gap-1.5 text-xs text-[#73976A] font-semibold">
-                        <CheckCircle2 className="w-4 h-4" />
-                        <span>مكتمل</span>
+                    <div className="space-y-2">
+                      <div className="flex items-center justify-between text-xs">
+                        <div className="flex items-center gap-1 text-[#677E61] font-semibold">
+                          <CheckCircle2 className="w-4 h-4" />
+                          <span>تمت قراءته</span>
+                        </div>
+                        {entry.finishedAt && (
+                          <span className="text-[#7A7468]">
+                            أُنجز في {formatDateArabic(entry.finishedAt)}
+                          </span>
+                        )}
                       </div>
-                      <span className="text-[11px] text-[#7A7468]">
-                        {entry.finishedAt
-                          ? `أُنهي في ${formatDateArabic(entry.finishedAt)}`
-                          : 'تم الانتهاء'}
-                      </span>
+
+                      {/* Completed 100% full green progress line */}
+                      <div className="w-full h-1.5 bg-[#73976A]/20 rounded-full overflow-hidden">
+                        <div className="h-full bg-[#73976A] w-full rounded-full" />
+                      </div>
                     </div>
                   )}
                 </div>

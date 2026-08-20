@@ -27,7 +27,7 @@ import {
   calculateRatingDistribution
 } from '../utils/formatters';
 
-export default function BookDetailPage({ bookId, setView, showToast }) {
+export default function BookDetailPage({ bookId, setView, showToast, currentUser, onOpenAuth }) {
   const [book, setBook] = useState(null);
   const [loading, setLoading] = useState(true);
 
@@ -45,14 +45,14 @@ export default function BookDetailPage({ bookId, setView, showToast }) {
   const loadBook = async () => {
     if (!bookId) return;
     setLoading(true);
-    const data = await getBook(bookId);
+    const data = await getBook(bookId, currentUser ? currentUser.id : null);
     setBook(data);
     setLoading(false);
   };
 
   useEffect(() => {
     loadBook();
-  }, [bookId]);
+  }, [bookId, currentUser]);
 
   if (loading) {
     return (
@@ -79,20 +79,32 @@ export default function BookDetailPage({ bookId, setView, showToast }) {
   const distribution = calculateRatingDistribution(book.reviews || []);
 
   const handleAddToLibrary = async () => {
-    await addToLibrary(book.id, 'want');
+    if (!currentUser) {
+      onOpenAuth();
+      return;
+    }
+    await addToLibrary(book.id, 'want', currentUser);
     showToast('تمت الإضافة لمكتبتك');
     loadBook();
   };
 
   const handleOpenReviewModal = () => {
+    if (!currentUser) {
+      onOpenAuth();
+      return;
+    }
     setIsReviewModalOpen(true);
   };
 
   const handleSubmitReview = async (e) => {
     e.preventDefault();
     if (!newReviewText.trim()) return;
+    if (!currentUser) {
+      onOpenAuth();
+      return;
+    }
     setSubmittingReview(true);
-    await addReview(book.id, newRating, newReviewText);
+    await addReview(book.id, newRating, newReviewText, currentUser);
     setSubmittingReview(false);
     setIsReviewModalOpen(false);
     setNewReviewText('');
@@ -102,7 +114,11 @@ export default function BookDetailPage({ bookId, setView, showToast }) {
   };
 
   const handleToggleLike = async (reviewId) => {
-    await toggleLike(reviewId);
+    if (!currentUser) {
+      onOpenAuth();
+      return;
+    }
+    await toggleLike(reviewId, currentUser);
     showToast('تم الإعجاب');
     loadBook();
   };
@@ -124,7 +140,11 @@ export default function BookDetailPage({ bookId, setView, showToast }) {
   const handleAddComment = async (reviewId) => {
     const text = (commentInputs[reviewId] || '').trim();
     if (!text) return;
-    await addComment(reviewId, text);
+    if (!currentUser) {
+      onOpenAuth();
+      return;
+    }
+    await addComment(reviewId, text, currentUser);
     setCommentInputs((prev) => ({ ...prev, [reviewId]: '' }));
     showToast('تم النشر');
     loadBook();
