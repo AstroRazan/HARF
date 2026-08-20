@@ -11,7 +11,7 @@ export default function BottomNav({ currentView, setView }) {
 
   return (
     <nav
-      className="md:hidden fixed bottom-0 left-0 right-0 z-40 bg-[#FAF7F2]/95 backdrop-blur-md border-t border-[#E5DFD5] py-1.5 px-2 safe-area-pb"
+      className="md:hidden fixed bottom-0 left-0 right-0 z-40 bg-[#FDF8F0]/95 backdrop-blur-md border-t border-[#E2D2BC] py-1.5 px-2 safe-area-pb"
       aria-label="التنقل عبر الهاتف"
     >
       <div className="flex items-center justify-around">
@@ -25,8 +25,8 @@ export default function BottomNav({ currentView, setView }) {
               onClick={() => setView({ name: tab.id })}
               className={`flex flex-col items-center justify-center py-1 px-3 rounded-xl transition-all ${
                 isActive
-                  ? 'text-[#C0703A] font-semibold'
-                  : 'text-[#8A8681] hover:text-[#2C2C2A]'
+                  ? 'text-[#BD4444] font-semibold'
+                  : 'text-[#7A7468] hover:text-[#2B2B26]'
               }`}
               aria-label={tab.label}
               aria-current={isActive ? 'page' : undefined}

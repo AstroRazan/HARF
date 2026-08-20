@@ -56,7 +56,7 @@ export default function BookDetailPage({ bookId, setView, showToast }) {
 
   if (loading) {
     return (
-      <div className="p-12 text-center text-[#8A8681] text-sm animate-pulse">
+      <div className="p-12 text-center text-[#7A7468] text-sm animate-pulse">
         جاري تحميل تفاصيل الكتاب...
       </div>
     );
@@ -65,10 +65,10 @@ export default function BookDetailPage({ bookId, setView, showToast }) {
   if (!book) {
     return (
       <div className="p-12 text-center space-y-4">
-        <p className="text-[#8A8681] text-sm">الكتاب غير موجود.</p>
+        <p className="text-[#7A7468] text-sm">الكتاب غير موجود.</p>
         <button
           onClick={() => setView({ name: 'library' })}
-          className="text-xs font-semibold py-2 px-4 rounded-xl bg-[#6B7F5C] text-[#FAF7F2]"
+          className="text-xs font-semibold py-2 px-4 rounded-xl bg-[#BD4444] hover:bg-[#A43939] text-[#FDF8F0]"
         >
           العودة للمكتبة
         </button>
@@ -80,7 +80,7 @@ export default function BookDetailPage({ bookId, setView, showToast }) {
 
   const handleAddToLibrary = async () => {
     await addToLibrary(book.id, 'want');
-    showToast('بيانات تجريبية — تمت الإضافة لمكتبتك');
+    showToast('تمت الإضافة لمكتبتك');
     loadBook();
   };
 
@@ -97,13 +97,13 @@ export default function BookDetailPage({ bookId, setView, showToast }) {
     setIsReviewModalOpen(false);
     setNewReviewText('');
     setNewRating(5);
-    showToast('بيانات تجريبية — تم نشر رأيك');
+    showToast('تم النشر');
     loadBook();
   };
 
   const handleToggleLike = async (reviewId) => {
     await toggleLike(reviewId);
-    showToast('بيانات تجريبية — تم التفاعل');
+    showToast('تم الإعجاب');
     loadBook();
   };
 
@@ -126,7 +126,7 @@ export default function BookDetailPage({ bookId, setView, showToast }) {
     if (!text) return;
     await addComment(reviewId, text);
     setCommentInputs((prev) => ({ ...prev, [reviewId]: '' }));
-    showToast('بيانات تجريبية — تم إضافة الرد');
+    showToast('تم النشر');
     loadBook();
   };
 
@@ -136,7 +136,7 @@ export default function BookDetailPage({ bookId, setView, showToast }) {
       <div>
         <button
           onClick={() => setView({ name: 'library' })}
-          className="inline-flex items-center gap-1.5 text-xs text-[#8A8681] hover:text-[#2C2C2A] transition-colors focus-visible:ring-1 focus-visible:ring-[#6B7F5C] rounded-md px-1 py-0.5"
+          className="inline-flex items-center gap-1.5 text-xs text-[#7A7468] hover:text-[#2B2B26] transition-colors focus-visible:ring-1 focus-visible:ring-[#677E61] rounded-md px-1 py-0.5"
         >
           <ArrowRight className="w-3.5 h-3.5" />
           <span>العودة إلى المكتبة</span>
@@ -144,7 +144,7 @@ export default function BookDetailPage({ bookId, setView, showToast }) {
       </div>
 
       {/* 1. Header Section: Cover, Info, Actions */}
-      <section className="bg-[#FAF7F2] border border-[#E5DFD5] rounded-card p-4 sm:p-6 md:p-8">
+      <section className="bg-[#FDF8F0] border border-[#E2D2BC] rounded-card p-4 sm:p-6 md:p-8">
         <div className="flex flex-col md:flex-row gap-6 md:gap-8 items-center md:items-start">
           {/* Cover */}
           <div className="shrink-0">
@@ -152,6 +152,8 @@ export default function BookDetailPage({ bookId, setView, showToast }) {
               title={book.title}
               author={book.author}
               category={book.category}
+              coverUrl={book.coverUrl}
+              language={book.language}
               size="lg"
             />
           </div>
@@ -159,36 +161,43 @@ export default function BookDetailPage({ bookId, setView, showToast }) {
           {/* Details */}
           <div className="flex-1 text-center md:text-right space-y-4">
             <div>
-              <div className="inline-block bg-[#E8E2D7] text-[#2C2C2A] text-xs font-semibold px-2.5 py-0.5 rounded-full mb-2">
+              <div className="inline-block bg-[#F1DEC4] text-[#2B2B26] text-xs font-semibold px-2.5 py-0.5 rounded-full mb-2">
                 {book.category}
               </div>
-              <h1 className="text-xl sm:text-2xl md:text-3xl font-bold font-serif text-[#2C2C2A] leading-tight">
+              <h1
+                className="text-xl sm:text-2xl md:text-3xl font-bold font-serif text-[#2B2B26] leading-tight"
+                dir={book.language === 'en' ? 'ltr' : 'rtl'}
+                style={book.language === 'en' ? { direction: 'ltr' } : {}}
+              >
                 {book.title}
               </h1>
-              <p className="text-sm sm:text-base text-[#8A8681] mt-1 font-medium">
+              <p
+                className="text-sm sm:text-base text-[#7A7468] mt-1 font-medium"
+                dir={book.language === 'en' ? 'ltr' : 'rtl'}
+              >
                 {book.author}
               </p>
             </div>
 
             {/* Meta Tags */}
-            <div className="flex flex-wrap items-center justify-center md:justify-start gap-4 text-xs text-[#8A8681] border-y border-[#E5DFD5]/60 py-2.5">
+            <div className="flex flex-wrap items-center justify-center md:justify-start gap-4 text-xs text-[#7A7468] border-y border-[#E2D2BC]/60 py-2.5">
               <div>
                 <span>عدد الصفحات: </span>
-                <span className="font-semibold text-[#2C2C2A]">
+                <span className="font-semibold text-[#2B2B26]">
                   {toArabicDigits(book.pages)} صفحة
                 </span>
               </div>
-              <span className="text-[#D5CDC1]">|</span>
+              <span className="text-[#DFCEB7]">|</span>
               <div>
                 <span>سنة النشر: </span>
-                <span className="font-semibold text-[#2C2C2A]">
+                <span className="font-semibold text-[#2B2B26]">
                   {toArabicDigits(book.year)} م
                 </span>
               </div>
             </div>
 
             {/* Synopsis */}
-            <p className="text-sm text-[#2C2C2A]/90 leading-relaxed">
+            <p className="text-sm text-[#2B2B26]/90 leading-relaxed">
               {book.synopsis}
             </p>
 
@@ -197,7 +206,7 @@ export default function BookDetailPage({ bookId, setView, showToast }) {
               {/* Primary button */}
               <button
                 onClick={handleOpenReviewModal}
-                className="bg-[#6B7F5C] hover:bg-[#546648] text-[#FAF7F2] font-semibold text-xs sm:text-sm px-5 py-2.5 rounded-xl transition-all shadow-sm focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-[#6B7F5C]"
+                className="bg-[#BD4444] hover:bg-[#A43939] text-[#FDF8F0] font-semibold text-xs sm:text-sm px-5 py-2.5 rounded-xl transition-all shadow-sm focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-[#BD4444]"
               >
                 اكتب رأيك
               </button>
@@ -208,8 +217,8 @@ export default function BookDetailPage({ bookId, setView, showToast }) {
                 disabled={Boolean(book.libraryStatus)}
                 className={`text-xs sm:text-sm font-semibold px-4 py-2.5 rounded-xl border transition-all flex items-center gap-1.5 ${
                   book.libraryStatus
-                    ? 'border-[#6B7F5C]/40 bg-[#6B7F5C]/10 text-[#6B7F5C]'
-                    : 'border-[#E5DFD5] text-[#2C2C2A] hover:bg-[#E8E2D7]'
+                    ? 'border-[#73976A]/40 bg-[#73976A]/10 text-[#677E61]'
+                    : 'border-[#E2D2BC] text-[#2B2B26] hover:bg-[#F1DEC4]'
                 }`}
               >
                 {book.libraryStatus ? (
@@ -230,35 +239,35 @@ export default function BookDetailPage({ bookId, setView, showToast }) {
       </section>
 
       {/* 2. Rating & Statistics Section */}
-      <section className="bg-[#FAF7F2] border border-[#E5DFD5] rounded-card p-5 sm:p-6">
+      <section className="bg-[#FDF8F0] border border-[#E2D2BC] rounded-card p-5 sm:p-6">
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 items-center">
           {/* Average Rating Block */}
-          <div className="text-center md:border-l md:border-[#E5DFD5] md:pl-6">
-            <div className="text-4xl sm:text-5xl font-bold font-serif text-[#C0703A]">
+          <div className="text-center md:border-l md:border-[#E2D2BC] md:pl-6">
+            <div className="text-4xl sm:text-5xl font-bold font-serif text-[#BD4444]">
               {toArabicDigits(book.averageRating || 0)}
             </div>
             <div className="flex justify-center my-2">
               <StarRating rating={book.averageRating} size="md" />
             </div>
-            <p className="text-xs text-[#8A8681]">
+            <p className="text-xs text-[#7A7468]">
               إجمالي {toArabicDigits(book.reviewsCount)} مراجعة
             </p>
           </div>
 
-          {/* Star Distribution Bars */}
+          {/* Star Distribution Bars (Progress bar: accent red on sand track) */}
           <div className="md:col-span-2 space-y-2">
             {distribution.map((d) => (
               <div key={d.stars} className="flex items-center gap-3 text-xs">
-                <span className="w-12 text-[#8A8681] text-left shrink-0">
+                <span className="w-12 text-[#7A7468] text-left shrink-0">
                   {toArabicDigits(d.stars)} نجوم
                 </span>
-                <div className="flex-1 h-2 bg-[#E8E2D7] rounded-full overflow-hidden">
+                <div className="flex-1 h-2 bg-[#F1DEC4] rounded-full overflow-hidden">
                   <div
-                    className="h-full bg-[#C0703A] rounded-full transition-all duration-500"
+                    className="h-full bg-[#BD4444] rounded-full transition-all duration-500"
                     style={{ width: `${d.percentage}%` }}
                   />
                 </div>
-                <span className="w-10 text-[#8A8681] text-right font-medium shrink-0">
+                <span className="w-10 text-[#7A7468] text-right font-medium shrink-0">
                   {toArabicDigits(d.count)}
                 </span>
               </div>
@@ -270,23 +279,23 @@ export default function BookDetailPage({ bookId, setView, showToast }) {
       {/* 3. Opinions / Reviews Section */}
       <section className="space-y-4">
         <div className="flex items-center justify-between px-1">
-          <h2 className="text-lg font-bold text-[#2C2C2A] font-serif">
+          <h2 className="text-lg font-bold text-[#2B2B26] font-serif">
             الآراء والنقاشات ({toArabicDigits(book.reviews?.length || 0)})
           </h2>
           <button
             onClick={handleOpenReviewModal}
-            className="text-xs font-semibold text-[#6B7F5C] hover:underline"
+            className="text-xs font-semibold text-[#BD4444] hover:underline"
           >
             + إضافة رأي
           </button>
         </div>
 
         {(!book.reviews || book.reviews.length === 0) ? (
-          <div className="bg-[#FAF7F2] border border-[#E5DFD5] rounded-card p-8 text-center space-y-3">
-            <p className="text-sm text-[#8A8681]">لا توجد آراء بعد حول هذا الكتاب.</p>
+          <div className="bg-[#FDF8F0] border border-[#E2D2BC] rounded-card p-8 text-center space-y-3">
+            <p className="text-sm text-[#7A7468]">لا توجد آراء بعد حول هذا الكتاب.</p>
             <button
               onClick={handleOpenReviewModal}
-              className="text-xs font-semibold py-2 px-4 rounded-xl bg-[#6B7F5C] text-[#FAF7F2]"
+              className="text-xs font-semibold py-2 px-4 rounded-xl bg-[#BD4444] hover:bg-[#A43939] text-[#FDF8F0]"
             >
               كن أول من يكتب رأيه
             </button>
@@ -302,19 +311,19 @@ export default function BookDetailPage({ bookId, setView, showToast }) {
               return (
                 <article
                   key={rev.id}
-                  className="bg-[#FAF7F2] border border-[#E5DFD5] rounded-card p-4 sm:p-5 space-y-3"
+                  className="bg-[#FDF8F0] border border-[#E2D2BC] rounded-card p-4 sm:p-5 space-y-3"
                 >
                   {/* Reviewer Header */}
                   <div className="flex items-center justify-between">
                     <div className="flex items-center gap-2.5">
-                      <div className="w-8 h-8 rounded-full bg-[#E8E2D7] text-[#2C2C2A] font-semibold text-xs flex items-center justify-center border border-[#D5CDC1]">
+                      <div className="w-8 h-8 rounded-full bg-[#F1DEC4] text-[#2B2B26] font-semibold text-xs flex items-center justify-center border border-[#DFCEB7]">
                         {rev.userName ? rev.userName.slice(0, 2) : 'قارئ'}
                       </div>
                       <div>
-                        <h3 className="font-semibold text-xs sm:text-sm text-[#2C2C2A]">
+                        <h3 className="font-semibold text-xs sm:text-sm text-[#2B2B26]">
                           {rev.userName}
                         </h3>
-                        <p className="text-[11px] text-[#8A8681]">
+                        <p className="text-[11px] text-[#7A7468]">
                           {formatDateArabic(rev.createdAt)}
                         </p>
                       </div>
@@ -323,24 +332,24 @@ export default function BookDetailPage({ bookId, setView, showToast }) {
                   </div>
 
                   {/* Review Text */}
-                  <p className="text-xs sm:text-sm text-[#2C2C2A] leading-relaxed">
+                  <p className="text-xs sm:text-sm text-[#2B2B26] leading-relaxed">
                     {rev.text}
                   </p>
 
                   {/* Actions: Like & Comments toggle */}
-                  <div className="flex items-center gap-4 pt-1 text-xs text-[#8A8681]">
+                  <div className="flex items-center gap-4 pt-1 text-xs text-[#7A7468]">
                     <button
                       onClick={() => handleToggleLike(rev.id)}
                       className={`flex items-center gap-1.5 py-1 px-2 rounded-lg transition-colors ${
                         isLiked
-                          ? 'text-[#C0703A] font-semibold bg-[#C0703A]/10'
-                          : 'hover:text-[#2C2C2A] hover:bg-[#E8E2D7]'
+                          ? 'text-[#BD4444] font-semibold bg-[#BD4444]/10'
+                          : 'hover:text-[#2B2B26] hover:bg-[#F1DEC4]'
                       }`}
                       aria-label="إعجاب بالرأي"
                     >
                       <Heart
                         className={`w-4 h-4 ${
-                          isLiked ? 'fill-[#C0703A] text-[#C0703A]' : ''
+                          isLiked ? 'fill-[#BD4444] text-[#BD4444]' : ''
                         }`}
                       />
                       <span>{toArabicDigits(likesCount)}</span>
@@ -348,7 +357,7 @@ export default function BookDetailPage({ bookId, setView, showToast }) {
 
                     <button
                       onClick={() => handleToggleComments(rev.id)}
-                      className="flex items-center gap-1.5 py-1 px-2 rounded-lg hover:text-[#2C2C2A] hover:bg-[#E8E2D7] transition-colors"
+                      className="flex items-center gap-1.5 py-1 px-2 rounded-lg hover:text-[#2B2B26] hover:bg-[#F1DEC4] transition-colors"
                       aria-label="عرض الردود"
                     >
                       <MessageCircle className="w-4 h-4" />
@@ -363,24 +372,24 @@ export default function BookDetailPage({ bookId, setView, showToast }) {
 
                   {/* Collapsible Comments Area */}
                   {isOpen && (
-                    <div className="pt-3 border-t border-[#E5DFD5]/70 space-y-3">
+                    <div className="pt-3 border-t border-[#E2D2BC]/70 space-y-3">
                       {/* Comments List */}
                       {rev.comments && rev.comments.length > 0 && (
-                        <div className="space-y-2 pr-4 border-r-2 border-[#E5DFD5]">
+                        <div className="space-y-2 pr-4 border-r-2 border-[#E2D2BC]">
                           {rev.comments.map((c) => (
                             <div
                               key={c.id}
-                              className="bg-[#F2EBE0]/60 p-2.5 rounded-lg text-xs space-y-1"
+                              className="bg-[#F1DEC4]/40 p-2.5 rounded-lg text-xs space-y-1"
                             >
-                              <div className="flex items-center justify-between text-[#8A8681]">
-                                <span className="font-semibold text-[#2C2C2A]">
+                              <div className="flex items-center justify-between text-[#7A7468]">
+                                <span className="font-semibold text-[#2B2B26]">
                                   {c.userName}
                                 </span>
                                 <span className="text-[10px]">
                                   {formatDateArabic(c.createdAt)}
                                 </span>
                               </div>
-                              <p className="text-[#2C2C2A]">{c.text}</p>
+                              <p className="text-[#2B2B26]">{c.text}</p>
                             </div>
                           ))}
                         </div>
@@ -396,11 +405,11 @@ export default function BookDetailPage({ bookId, setView, showToast }) {
                           onKeyDown={(e) => {
                             if (e.key === 'Enter') handleAddComment(rev.id);
                           }}
-                          className="flex-1 bg-[#FAF7F2] border border-[#E5DFD5] rounded-xl px-3 py-1.5 text-xs text-[#2C2C2A] placeholder-[#8A8681]/60 focus:border-[#6B7F5C] focus:ring-1 focus:ring-[#6B7F5C]"
+                          className="flex-1 bg-[#FDF8F0] border border-[#E2D2BC] rounded-xl px-3 py-1.5 text-xs text-[#2B2B26] placeholder-[#7A7468]/60 focus:border-[#677E61] focus:ring-1 focus:ring-[#677E61]"
                         />
                         <button
                           onClick={() => handleAddComment(rev.id)}
-                          className="bg-[#6B7F5C] text-[#FAF7F2] hover:bg-[#546648] text-xs font-medium px-3 py-1.5 rounded-xl transition-colors shrink-0"
+                          className="bg-[#BD4444] text-[#FDF8F0] hover:bg-[#A43939] text-xs font-medium px-3 py-1.5 rounded-xl transition-colors shrink-0"
                         >
                           رد
                         </button>
@@ -421,26 +430,26 @@ export default function BookDetailPage({ bookId, setView, showToast }) {
           role="dialog"
           aria-modal="true"
         >
-          <div className="bg-[#FAF7F2] border border-[#E5DFD5] rounded-container w-full max-w-md p-6 shadow-xl relative">
+          <div className="bg-[#FDF8F0] border border-[#E2D2BC] rounded-container w-full max-w-md p-6 shadow-xl relative">
             <button
               onClick={() => setIsReviewModalOpen(false)}
-              className="absolute left-4 top-4 text-[#8A8681] hover:text-[#2C2C2A] p-1.5 rounded-full hover:bg-[#E5DFD5]/50 transition-colors"
+              className="absolute left-4 top-4 text-[#7A7468] hover:text-[#2B2B26] p-1.5 rounded-full hover:bg-[#E2D2BC]/50 transition-colors"
               aria-label="إغلاق"
             >
               <X className="w-5 h-5" />
             </button>
 
-            <h2 className="text-lg font-bold font-serif text-[#2C2C2A] mb-1">
+            <h2 className="text-lg font-bold font-serif text-[#2B2B26] mb-1">
               اكتب رأيك في الكتاب
             </h2>
-            <p className="text-xs text-[#8A8681] mb-4">
+            <p className="text-xs text-[#7A7468] mb-4">
               {book.title} — {book.author}
             </p>
 
             <form onSubmit={handleSubmitReview} className="space-y-4">
               {/* Star selector */}
               <div>
-                <label className="block text-xs font-medium text-[#2C2C2A] mb-1.5">
+                <label className="block text-xs font-medium text-[#2B2B26] mb-1.5">
                   تقييمك
                 </label>
                 <StarRating
@@ -453,7 +462,7 @@ export default function BookDetailPage({ bookId, setView, showToast }) {
 
               {/* Textarea */}
               <div>
-                <label className="block text-xs font-medium text-[#2C2C2A] mb-1.5">
+                <label className="block text-xs font-medium text-[#2B2B26] mb-1.5">
                   رأيك وانطباعك
                 </label>
                 <textarea
@@ -462,7 +471,7 @@ export default function BookDetailPage({ bookId, setView, showToast }) {
                   value={newReviewText}
                   onChange={(e) => setNewReviewText(e.target.value)}
                   placeholder="ما الذي أعجبك في الكتاب؟ وما هي انطباعاتك الأساسية؟"
-                  className="w-full bg-[#FAF7F2] border border-[#E5DFD5] rounded-xl p-3 text-xs sm:text-sm text-[#2C2C2A] placeholder-[#8A8681]/60 focus:border-[#6B7F5C] focus:ring-1 focus:ring-[#6B7F5C]"
+                  className="w-full bg-[#FDF8F0] border border-[#E2D2BC] rounded-xl p-3 text-xs sm:text-sm text-[#2B2B26] placeholder-[#7A7468]/60 focus:border-[#677E61] focus:ring-1 focus:ring-[#677E61]"
                 />
               </div>
 
@@ -470,7 +479,7 @@ export default function BookDetailPage({ bookId, setView, showToast }) {
                 <button
                   type="submit"
                   disabled={submittingReview}
-                  className="w-full bg-[#6B7F5C] hover:bg-[#546648] text-[#FAF7F2] font-semibold py-2.5 px-4 rounded-xl transition-colors shadow-sm focus-visible:ring-2 focus-visible:ring-[#6B7F5C]"
+                  className="w-full bg-[#BD4444] hover:bg-[#A43939] text-[#FDF8F0] font-semibold py-2.5 px-4 rounded-xl transition-colors shadow-sm focus-visible:ring-2 focus-visible:ring-[#BD4444]"
                 >
                   نشر الرأي
                 </button>

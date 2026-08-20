@@ -42,7 +42,7 @@ export default function StarRating({
               onMouseLeave={() => interactive && setHoverRating(0)}
               className={`${
                 interactive
-                  ? 'cursor-pointer p-0.5 hover:scale-110 transition-transform focus-visible:ring-1 focus-visible:ring-[#6B7F5C]'
+                  ? 'cursor-pointer p-0.5 hover:scale-110 transition-transform focus-visible:ring-1 focus-visible:ring-[#677E61]'
                   : 'cursor-default pointer-events-none'
               }`}
               aria-label={`${toArabicDigits(starNumber)} من ٥ نجوم`}
@@ -50,8 +50,8 @@ export default function StarRating({
               <Star
                 className={`${starSizes[size] || starSizes.md} ${
                   isFilled
-                    ? 'fill-[#C0703A] text-[#C0703A]'
-                    : 'fill-transparent text-[#D5CDC1]'
+                    ? 'fill-[#BD4444] text-[#BD4444]'
+                    : 'fill-transparent text-[#DFCEB7]'
                 } transition-colors`}
               />
             </button>
@@ -60,7 +60,7 @@ export default function StarRating({
       </div>
 
       {showNumber && rating > 0 && (
-        <span className="text-xs font-semibold text-[#2C2C2A] mr-1">
+        <span className="text-xs font-semibold text-[#2B2B26] mr-1">
           {toArabicDigits(rating)}
         </span>
       )}

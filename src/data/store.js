@@ -34,7 +34,15 @@ export const getBooks = async (options = {}) => {
   let result = [...books];
 
   if (category && category !== 'الكل') {
-    result = result.filter((b) => b.category === category);
+    if (category === 'إنجليزي') {
+      result = result.filter((b) => b.language === 'en');
+    } else {
+      result = result.filter((b) => b.category === category);
+    }
+  }
+
+  if (options.language) {
+    result = result.filter((b) => b.language === options.language);
   }
 
   if (search && search.trim()) {
@@ -65,8 +73,8 @@ export const getBooks = async (options = {}) => {
   if (sort === 'most-discussed') {
     result.sort((a, b) => b.reviewsCount - a.reviewsCount);
   } else if (sort === 'newest') {
-    // preserve or reverse id
-    result.sort((a, b) => parseInt(b.id.replace('book-', '')) - parseInt(a.id.replace('book-', '')));
+    // Sort by id descending (newest first)
+    result.sort((a, b) => b.id.localeCompare(a.id, undefined, { numeric: true }));
   }
 
   return JSON.parse(JSON.stringify(result));

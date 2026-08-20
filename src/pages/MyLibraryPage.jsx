@@ -37,7 +37,7 @@ export default function MyLibraryPage({ setView, showToast }) {
 
   const handleStartReading = async (bookId) => {
     await addToLibrary(bookId, 'reading');
-    showToast('بيانات تجريبية — بدأت قراءة الكتاب');
+    showToast('تم البدء في قراءة الكتاب');
     loadLibrary();
   };
 
@@ -53,9 +53,9 @@ export default function MyLibraryPage({ setView, showToast }) {
     const finalPage = Math.min(Math.max(0, pageNum), totalPages);
     await updateProgress(bookId, finalPage);
     if (finalPage >= totalPages) {
-      showToast('بيانات تجريبية — تهانينا! أتممت قراءة الكتاب');
+      showToast('تهانينا! أتممت قراءة الكتاب');
     } else {
-      showToast('بيانات تجريبية — تم تحديث التقدم');
+      showToast('تم تحديث التقدم');
     }
     loadLibrary();
   };
@@ -63,29 +63,29 @@ export default function MyLibraryPage({ setView, showToast }) {
   return (
     <div className="space-y-8">
       {/* 1. Top Figures Section (Exactly Two Figures Only) */}
-      <section className="bg-[#FAF7F2] border border-[#E5DFD5] rounded-card p-5 sm:p-6">
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 divide-y sm:divide-y-0 sm:divide-x sm:divide-x-reverse divide-[#E5DFD5]">
+      <section className="bg-[#FDF8F0] border border-[#E2D2BC] rounded-card p-5 sm:p-6">
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 divide-y sm:divide-y-0 sm:divide-x sm:divide-x-reverse divide-[#E2D2BC]">
           {/* Figure 1: Books Finished */}
           <div className="text-center pb-4 sm:pb-0">
-            <span className="text-xs font-medium text-[#8A8681] block mb-1">
+            <span className="text-xs font-medium text-[#7A7468] block mb-1">
               الكتب المكتملة
             </span>
-            <div className="text-3xl sm:text-4xl font-bold font-serif text-[#6B7F5C]">
+            <div className="text-3xl sm:text-4xl font-bold font-serif text-[#73976A]">
               {toArabicDigits(finishedCount)}
             </div>
-            <span className="text-[11px] text-[#8A8681] mt-1 block">
+            <span className="text-[11px] text-[#7A7468] mt-1 block">
               كتاب تم إنهاؤه
             </span>
           </div>
 
           {/* Figure 2: Reading Streak & 7-Day Dots */}
           <div className="text-center pt-4 sm:pt-0 sm:pr-6">
-            <span className="text-xs font-medium text-[#8A8681] block mb-1">
+            <span className="text-xs font-medium text-[#7A7468] block mb-1">
               سلسلة القراءة
             </span>
-            <div className="flex items-center justify-center gap-1.5 text-3xl sm:text-4xl font-bold font-serif text-[#C0703A]">
+            <div className="flex items-center justify-center gap-1.5 text-3xl sm:text-4xl font-bold font-serif text-[#BD4444]">
               <span>{toArabicDigits(streakDays)}</span>
-              <span className="text-sm font-sans font-medium text-[#8A8681]">يومًا</span>
+              <span className="text-sm font-sans font-medium text-[#7A7468]">يومًا</span>
             </div>
 
             {/* 7-day dot row */}
@@ -95,12 +95,12 @@ export default function MyLibraryPage({ setView, showToast }) {
                   <div
                     className={`w-2.5 h-2.5 rounded-full transition-all ${
                       active
-                        ? 'bg-[#C0703A] shadow-xs ring-2 ring-[#C0703A]/20'
-                        : 'bg-[#E8E2D7]'
+                        ? 'bg-[#BD4444] shadow-xs ring-2 ring-[#BD4444]/20'
+                        : 'bg-[#F1DEC4]'
                     }`}
                     title={active ? 'يوم نشط' : 'لم تقرأ'}
                   />
-                  <span className="text-[9px] text-[#8A8681]">{dayNames[i]}</span>
+                  <span className="text-[9px] text-[#7A7468]">{dayNames[i]}</span>
                 </div>
               ))}
             </div>
@@ -110,15 +110,15 @@ export default function MyLibraryPage({ setView, showToast }) {
 
       {/* 2. User's Books Grid */}
       {loading ? (
-        <div className="p-12 text-center text-[#8A8681] text-sm animate-pulse">
+        <div className="p-12 text-center text-[#7A7468] text-sm animate-pulse">
           جاري تحميل مكتبتك...
         </div>
       ) : libraryEntries.length === 0 ? (
-        <div className="bg-[#FAF7F2] border border-[#E5DFD5] rounded-card p-10 text-center space-y-3">
-          <p className="text-sm text-[#8A8681]">لم تضف أي كتاب إلى مكتبتك بعد.</p>
+        <div className="bg-[#FDF8F0] border border-[#E2D2BC] rounded-card p-10 text-center space-y-3">
+          <p className="text-sm text-[#7A7468]">لم تضف أي كتاب إلى مكتبتك بعد.</p>
           <button
             onClick={() => setView({ name: 'library' })}
-            className="text-xs font-semibold py-2 px-4 rounded-xl bg-[#6B7F5C] text-[#FAF7F2]"
+            className="text-xs font-semibold py-2 px-4 rounded-xl bg-[#BD4444] hover:bg-[#A43939] text-[#FDF8F0]"
           >
             تصفح الكتب
           </button>
@@ -139,7 +139,7 @@ export default function MyLibraryPage({ setView, showToast }) {
             return (
               <div
                 key={entry.bookId}
-                className="bg-[#FAF7F2] border border-[#E5DFD5] rounded-card p-4 flex flex-col justify-between space-y-4 hover:border-[#8A8681]/40 transition-colors"
+                className="bg-[#FDF8F0] border border-[#E2D2BC] rounded-card p-4 flex flex-col justify-between space-y-4 hover:border-[#BD4444]/40 transition-colors"
               >
                 <div className="flex gap-3.5 items-start">
                   {/* Small Cover */}
@@ -151,6 +151,8 @@ export default function MyLibraryPage({ setView, showToast }) {
                       title={book.title}
                       author={book.author}
                       category={book.category}
+                      coverUrl={book.coverUrl}
+                      language={book.language}
                       size="sm"
                     />
                   </div>
@@ -158,29 +160,34 @@ export default function MyLibraryPage({ setView, showToast }) {
                   {/* Info */}
                   <div className="flex-1 min-w-0">
                     <h3
-                      className="font-bold text-sm text-[#2C2C2A] line-clamp-1 cursor-pointer hover:text-[#C0703A]"
+                      className="font-bold text-sm text-[#2B2B26] line-clamp-1 cursor-pointer hover:text-[#BD4444]"
                       onClick={() => setView({ name: 'book', bookId: book.id })}
+                      dir={book.language === 'en' ? 'ltr' : 'rtl'}
+                      style={book.language === 'en' ? { direction: 'ltr' } : {}}
                     >
                       {book.title}
                     </h3>
-                    <p className="text-xs text-[#8A8681] line-clamp-1 mt-0.5">
+                    <p
+                      className="text-xs text-[#7A7468] line-clamp-1 mt-0.5"
+                      dir={book.language === 'en' ? 'ltr' : 'rtl'}
+                    >
                       {book.author}
                     </p>
-                    <span className="inline-block mt-2 text-[10px] bg-[#E8E2D7] text-[#2C2C2A] px-2 py-0.5 rounded-full">
+                    <span className="inline-block mt-2 text-[10px] bg-[#F1DEC4] text-[#2B2B26] px-2 py-0.5 rounded-full">
                       {book.category}
                     </span>
                   </div>
                 </div>
 
                 {/* Progress States */}
-                <div className="pt-2 border-t border-[#E5DFD5]/60">
+                <div className="pt-2 border-t border-[#E2D2BC]/60">
                   {/* STATE 1: Want to read */}
                   {entry.status === 'want' && (
                     <div className="flex items-center justify-between">
-                      <span className="text-xs text-[#8A8681]">في قائمة الرغبات</span>
+                      <span className="text-xs text-[#7A7468]">في قائمة الرغبات</span>
                       <button
                         onClick={() => handleStartReading(book.id)}
-                        className="bg-[#6B7F5C] hover:bg-[#546648] text-[#FAF7F2] text-xs font-semibold px-3 py-1.5 rounded-lg transition-colors flex items-center gap-1"
+                        className="bg-[#BD4444] hover:bg-[#A43939] text-[#FDF8F0] text-xs font-semibold px-3 py-1.5 rounded-lg transition-colors flex items-center gap-1"
                       >
                         <Play className="w-3 h-3 fill-current" />
                         <span>ابدأ القراءة</span>
@@ -192,25 +199,25 @@ export default function MyLibraryPage({ setView, showToast }) {
                   {entry.status === 'reading' && (
                     <div className="space-y-2.5">
                       <div className="flex items-center justify-between text-xs">
-                        <span className="text-[#8A8681]">
+                        <span className="text-[#7A7468]">
                           {toArabicDigits(currentPage)} من {toArabicDigits(totalPages)} صفحة
                         </span>
-                        <span className="font-semibold text-[#C0703A]">
+                        <span className="font-semibold text-[#BD4444]">
                           {toArabicDigits(progressPercent)}٪
                         </span>
                       </div>
 
-                      {/* Thin Progress Bar: clay fill on sand track */}
-                      <div className="w-full h-1.5 bg-[#E8E2D7] rounded-full overflow-hidden">
+                      {/* Thin Progress Bar: Accent red fill on sand track */}
+                      <div className="w-full h-1.5 bg-[#F1DEC4] rounded-full overflow-hidden">
                         <div
-                          className="h-full bg-[#C0703A] rounded-full transition-all duration-300"
+                          className="h-full bg-[#BD4444] rounded-full transition-all duration-300"
                           style={{ width: `${progressPercent}%` }}
                         />
                       </div>
 
                       {/* Quick page updater */}
                       <div className="flex items-center gap-2 pt-1">
-                        <label className="text-[11px] text-[#8A8681] shrink-0">
+                        <label className="text-[11px] text-[#7A7468] shrink-0">
                           الصفحة الحالية:
                         </label>
                         <input
@@ -219,11 +226,11 @@ export default function MyLibraryPage({ setView, showToast }) {
                           max={totalPages}
                           value={pageInputs[book.id] ?? currentPage}
                           onChange={(e) => handlePageInputChange(book.id, e.target.value)}
-                          className="w-20 bg-[#FAF7F2] border border-[#E5DFD5] rounded-lg px-2 py-1 text-xs text-center font-medium text-[#2C2C2A] focus:border-[#6B7F5C] focus:ring-1 focus:ring-[#6B7F5C]"
+                          className="w-20 bg-[#FDF8F0] border border-[#E2D2BC] rounded-lg px-2 py-1 text-xs text-center font-medium text-[#2B2B26] focus:border-[#677E61] focus:ring-1 focus:ring-[#677E61]"
                         />
                         <button
                           onClick={() => handleSaveProgress(book.id, totalPages)}
-                          className="text-xs font-medium bg-[#E8E2D7] hover:bg-[#D5CDC1] text-[#2C2C2A] px-2.5 py-1 rounded-lg transition-colors"
+                          className="text-xs font-medium bg-[#F1DEC4] hover:bg-[#E2D2BC] text-[#2B2B26] px-2.5 py-1 rounded-lg transition-colors"
                         >
                           تحديث
                         </button>
@@ -234,11 +241,11 @@ export default function MyLibraryPage({ setView, showToast }) {
                   {/* STATE 3: Finished */}
                   {entry.status === 'finished' && (
                     <div className="flex items-center justify-between">
-                      <div className="flex items-center gap-1.5 text-xs text-[#6B7F5C] font-semibold">
+                      <div className="flex items-center gap-1.5 text-xs text-[#73976A] font-semibold">
                         <CheckCircle2 className="w-4 h-4" />
                         <span>مكتمل</span>
                       </div>
-                      <span className="text-[11px] text-[#8A8681]">
+                      <span className="text-[11px] text-[#7A7468]">
                         {entry.finishedAt
                           ? `أُنهي في ${formatDateArabic(entry.finishedAt)}`
                           : 'تم الانتهاء'}

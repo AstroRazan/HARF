@@ -8,24 +8,28 @@ export default {
     extend: {
       colors: {
         harf: {
-          bg: '#F2EBE0',
-          surface: '#FAF7F2',
-          olive: '#6B7F5C',
-          'olive-dark': '#546648',
-          'olive-light': '#829772',
-          clay: '#C0703A',
-          'clay-dark': '#A35C2B',
-          'clay-light': '#D68956',
-          text: '#2C2C2A',
-          muted: '#8A8681',
-          border: '#E5DFD5',
-          track: '#E8E2D7',
-          card: '#FAF7F2'
+          bg: '#F1DEC4',
+          backdrop: '#F1DEC4',
+          surface: '#FDF8F0',
+          card: '#FDF8F0',
+          green: '#73976A',
+          'green-deep': '#677E61',
+          red: '#BD4444',
+          'red-dark': '#A43939',
+          'red-light': '#CF5A5A',
+          sand: '#F1DEC4',
+          text: '#2B2B26',
+          muted: '#7A7468',
+          border: '#E2D2BC',
+          track: '#F1DEC4'
         }
       },
       fontFamily: {
-        arabic: ['"IBM Plex Sans Arabic"', 'system-ui', 'sans-serif'],
-        serif: ['"Amiri"', 'Georgia', 'serif']
+        display: ['var(--font-display)', 'system-ui', 'sans-serif'],
+        body: ['var(--font-body)', 'system-ui', 'sans-serif'],
+        sans: ['var(--font-body)', 'system-ui', 'sans-serif'],
+        serif: ['var(--font-display)', 'system-ui', 'sans-serif'],
+        arabic: ['var(--font-body)', 'system-ui', 'sans-serif']
       },
       borderRadius: {
         'card': '14px',

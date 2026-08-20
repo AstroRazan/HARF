@@ -10,34 +10,34 @@ export default function Navbar({ currentView, setView, onOpenAuth, currentUser }
   ];
 
   return (
-    <header className="border-b border-[#E5DFD5] bg-[#FAF7F2]/90 backdrop-blur-md sticky top-0 z-40">
-      <div className="max-w-6xl mx-auto px-4 sm:px-6 h-16 flex items-center justify-between">
+    <header className="border-b border-[#E2D2BC] bg-[#FDF8F0]/90 backdrop-blur-md sticky top-0 z-40 w-full">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-20 flex items-center justify-between">
         {/* Right Side in RTL: Wordmark & Navigation */}
-        <div className="flex items-center gap-8">
+        <div className="flex items-center gap-10">
           {/* Wordmark */}
           <button
             onClick={() => setView({ name: 'home' })}
-            className="flex items-center gap-2 text-2xl font-bold font-serif text-[#2C2C2A] tracking-wider hover:opacity-80 transition-opacity focus-visible:ring-2 focus-visible:ring-[#6B7F5C] rounded-lg px-1"
+            className="flex items-center gap-2.5 text-[#2B2B26] hover:opacity-80 transition-opacity focus-visible:ring-2 focus-visible:ring-[#677E61] rounded-xl px-1 py-1"
             aria-label="حرف - الصفحة الرئيسية"
           >
-            <span className="w-8 h-8 rounded-lg bg-[#6B7F5C] text-[#FAF7F2] flex items-center justify-center text-lg font-serif shadow-sm">
+            <span className="w-9 h-9 rounded-xl bg-[#73976A] text-[#FDF8F0] flex items-center justify-center text-xl shadow-sm logo-text leading-none select-none">
               ح
             </span>
-            <span>حرف</span>
+            <span className="logo-text text-[28px] leading-tight tracking-normal">حرف</span>
           </button>
 
           {/* Desktop Nav links */}
-          <nav className="hidden md:flex items-center gap-1" aria-label="التنقل الرئيسي">
+          <nav className="hidden md:flex items-center gap-1.5" aria-label="التنقل الرئيسي">
             {navItems.map((item) => {
               const isActive = currentView.name === item.id;
               return (
                 <button
                   key={item.id}
                   onClick={() => setView({ name: item.id })}
-                  className={`px-3.5 py-1.5 rounded-lg text-sm font-medium transition-all ${
+                  className={`px-4 py-2 rounded-xl text-[16px] font-medium transition-all ${
                     isActive
-                      ? 'bg-[#E8E2D7] text-[#2C2C2A] font-semibold'
-                      : 'text-[#8A8681] hover:text-[#2C2C2A] hover:bg-[#F2EBE0]/60'
+                      ? 'bg-[#F1DEC4] text-[#2B2B26] font-semibold shadow-2xs'
+                      : 'text-[#7A7468] hover:text-[#2B2B26] hover:bg-[#F1DEC4]/60'
                   }`}
                 >
                   {item.label}
@@ -51,11 +51,11 @@ export default function Navbar({ currentView, setView, onOpenAuth, currentUser }
         <div className="flex items-center gap-3">
           <button
             onClick={onOpenAuth}
-            className="flex items-center gap-2 text-xs sm:text-sm font-medium text-[#2C2C2A] bg-[#FAF7F2] hover:bg-[#E8E2D7] border border-[#E5DFD5] px-3 py-1.5 rounded-xl transition-all shadow-2xs focus-visible:ring-2 focus-visible:ring-[#6B7F5C]"
+            className="flex items-center gap-2 text-sm sm:text-[15px] font-medium text-[#2B2B26] bg-[#FDF8F0] hover:bg-[#F1DEC4] border border-[#E2D2BC] px-4 py-2 rounded-xl transition-all shadow-2xs focus-visible:ring-2 focus-visible:ring-[#677E61]"
             aria-label="تسجيل الدخول أو إنشاء حساب"
             title="تسجيل الدخول / حساب جديد"
           >
-            <User className="w-4 h-4 text-[#6B7F5C]" />
+            <User className="w-4 h-4 text-[#73976A]" />
             <span className="hidden sm:inline">
               {currentUser ? currentUser.name : 'دخول'}
             </span>

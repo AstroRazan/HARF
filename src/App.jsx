@@ -32,7 +32,7 @@ export default function App() {
     loadUser();
   }, []);
 
-  const showToast = (message = 'بيانات تجريبية — لم يتم الحفظ') => {
+  const showToast = (message = 'تم بنجاح') => {
     setToastMessage(message);
     setToastVisible(true);
     setTimeout(() => {
@@ -41,7 +41,7 @@ export default function App() {
   };
 
   const handleAuthSuccess = ({ tab, name }) => {
-    showToast('بيانات تجريبية — تم بدء الجلسة');
+    showToast('تم تسجيل الدخول بنجاح');
     setCurrentUser((prev) => ({
       ...(prev || {}),
       name: name || 'أحمد يوسف'
@@ -54,73 +54,77 @@ export default function App() {
   }, [view]);
 
   return (
-    <div className="min-h-screen bg-[#F2EBE0] text-[#2C2C2A] py-0 md:py-6 px-0 md:px-4 lg:px-6 flex flex-col items-center">
-      {/* Main Rounded App Container (24px radius on md+, sitting on darker backdrop) */}
-      <div className="w-full max-w-5xl bg-[#FAF7F2] md:rounded-[24px] md:border md:border-[#E5DFD5] md:shadow-sm min-h-screen md:min-h-[92vh] flex flex-col overflow-hidden relative pb-16 md:pb-8">
-        {/* 1. Dismissible Top Banner */}
-        <TopBanner />
+    <div className="min-h-screen bg-[#FDF8F0] text-[#2B2B26] flex flex-col w-full">
+      {/* 1. Dismissible Top Banner (Full-bleed with max-w-7xl inner container) */}
+      <TopBanner />
 
-        {/* 2. Top Bar & Wordmark */}
-        <Navbar
-          currentView={view}
-          setView={setView}
-          onOpenAuth={() => setIsAuthOpen(true)}
-          currentUser={currentUser}
-        />
+      {/* 2. Top Bar & Wordmark (Full-bleed with max-w-7xl inner container) */}
+      <Navbar
+        currentView={view}
+        setView={setView}
+        onOpenAuth={() => setIsAuthOpen(true)}
+        currentUser={currentUser}
+      />
 
-        {/* 3. Page Body (One Job Per Page) */}
-        <main className="flex-1 px-4 sm:px-6 md:px-8 py-6 max-w-5xl mx-auto w-full">
-          {view.name === 'home' && (
-            <HomePage setView={setView} />
-          )}
+      {/* 3. Page Body (Full-bleed container with max-w-7xl centered content) */}
+      <main className="flex-1 w-full pb-16 md:pb-8">
+        {view.name === 'home' && (
+          <HomePage
+            setView={setView}
+            onOpenAuth={() => setIsAuthOpen(true)}
+          />
+        )}
 
-          {view.name === 'book' && (
-            <BookDetailPage
-              bookId={view.bookId}
-              setView={setView}
-              showToast={showToast}
-            />
-          )}
+        {view.name !== 'home' && (
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 w-full">
+            {view.name === 'book' && (
+              <BookDetailPage
+                bookId={view.bookId}
+                setView={setView}
+                showToast={showToast}
+              />
+            )}
 
-          {view.name === 'library' && (
-            <LibraryPage
-              setView={setView}
-              showToast={showToast}
-            />
-          )}
+            {view.name === 'library' && (
+              <LibraryPage
+                setView={setView}
+                showToast={showToast}
+              />
+            )}
 
-          {view.name === 'my-library' && (
-            <MyLibraryPage
-              setView={setView}
-              showToast={showToast}
-            />
-          )}
+            {view.name === 'my-library' && (
+              <MyLibraryPage
+                setView={setView}
+                showToast={showToast}
+              />
+            )}
 
-          {view.name === 'communities' && (
-            <CommunitiesPage
-              setView={setView}
-              showToast={showToast}
-            />
-          )}
-        </main>
+            {view.name === 'communities' && (
+              <CommunitiesPage
+                setView={setView}
+                showToast={showToast}
+              />
+            )}
+          </div>
+        )}
+      </main>
 
-        {/* 4. Mobile Bottom Navigation Tab Bar */}
-        <BottomNav currentView={view} setView={setView} />
+      {/* 4. Mobile Bottom Navigation Tab Bar */}
+      <BottomNav currentView={view} setView={setView} />
 
-        {/* 5. Auth Modal */}
-        <AuthModal
-          isOpen={isAuthOpen}
-          onClose={() => setIsAuthOpen(false)}
-          onAuthSuccess={handleAuthSuccess}
-        />
+      {/* 5. Auth Modal */}
+      <AuthModal
+        isOpen={isAuthOpen}
+        onClose={() => setIsAuthOpen(false)}
+        onAuthSuccess={handleAuthSuccess}
+      />
 
-        {/* 6. Floating Demo Toast */}
-        <Toast
-          message={toastMessage}
-          visible={toastVisible}
-          type="info"
-        />
-      </div>
+      {/* 6. Floating Demo Toast */}
+      <Toast
+        message={toastMessage}
+        visible={toastVisible}
+        type="info"
+      />
     </div>
   );
 }
