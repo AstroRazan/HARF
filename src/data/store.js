@@ -335,18 +335,40 @@ export const getUserStats = async (userId = null) => {
   if (!userId) {
     return {
       finishedCount: 0,
+      readingCount: 0,
+      pagesRead: 0,
+      reviewsCount: 0,
       streakDays: 0,
       streakWeek: [false, false, false, false, false, false, false]
     };
   }
 
   const userData = getUserData(userId);
-  const finishedCount = (userData.library || []).filter((e) => e.status === 'finished').length;
+  const library = userData.library || [];
+  const finishedCount = library.filter((e) => e.status === 'finished').length;
+  const readingCount = library.filter((e) => e.status === 'reading').length;
+
+  // Compute pages read
+  let pagesRead = 0;
+  library.forEach((entry) => {
+    if (entry.status === 'finished') {
+      const b = books.find((x) => x.id === entry.bookId);
+      pagesRead += b ? (b.pages || 250) : (entry.currentPage || 250);
+    } else if (entry.status === 'reading') {
+      pagesRead += (entry.currentPage || 0);
+    }
+  });
+
+  const reviews = getStoredReviews();
+  const reviewsCount = reviews.filter((r) => r.userId === userId).length;
 
   return {
     finishedCount,
-    streakDays: userData.streakDays || 0,
-    streakWeek: userData.streakWeek || [false, false, false, false, false, false, false]
+    readingCount,
+    pagesRead,
+    reviewsCount,
+    streakDays: userData.streakDays !== undefined ? userData.streakDays : (library.length > 0 ? 5 : 1),
+    streakWeek: userData.streakWeek || [true, true, true, false, true, true, true]
   };
 };
 
@@ -644,34 +666,141 @@ export const addPostComment = async (postId, text, user = null) => {
   return JSON.parse(JSON.stringify(newComment));
 };
 
-// 15. getLiveSession
-export const getLiveSession = async () => {
+const INITIAL_SESSIONS = [
+  {
+    id: 'sess-1',
+    title: 'جلسة قراءة صامتة مسائية',
+    durationMinutes: 25,
+    createdAt: '2026-08-20T08:00:00.000Z',
+    participants: [
+      { id: 'p-1', userId: 'user-2', userName: 'سارة الأحمد', bookTitle: 'مقدمة ابن خلدون' },
+      { id: 'p-2', userId: 'user-3', userName: 'طارق منصور', bookTitle: 'طوق الحمامة في الأُلفة والألَّاف' },
+      { id: 'p-3', userId: 'user-4', userName: 'ريم القحطاني', bookTitle: 'موسم الهجرة إلى الشمال' },
+      { id: 'p-4', userId: 'user-6', userName: 'مريم خالد', bookTitle: 'حياة في الإدارة' }
+    ]
+  },
+  {
+    id: 'sess-2',
+    title: 'قراءة عميقة في الروايات والدراما',
+    durationMinutes: 50,
+    createdAt: '2026-08-20T08:30:00.000Z',
+    participants: [
+      { id: 'p-5', userId: 'user-5', userName: 'عمر السعيد', bookTitle: 'الليالي البيضاء' },
+      { id: 'p-6', userId: 'user-2', userName: 'سارة الأحمد', bookTitle: 'ساق البامبو' }
+    ]
+  },
+  {
+    id: 'sess-3',
+    title: 'جلسة تركيز في الفلسفة ومناهج التفكير',
+    durationMinutes: 90,
+    createdAt: '2026-08-20T09:00:00.000Z',
+    participants: [
+      { id: 'p-7', userId: 'user-3', userName: 'طارق منصور', bookTitle: 'حي بن يقظان' }
+    ]
+  }
+];
+
+function getStoredSessions() {
+  const stored = safeGet(STORAGE_KEYS.SESSIONS || 'harf_sessions', null);
+  if (!stored || !Array.isArray(stored) || stored.length === 0) {
+    safeSet('harf_sessions', INITIAL_SESSIONS);
+    return INITIAL_SESSIONS;
+  }
+  return stored;
+}
+
+// 15. getSessions
+export const getSessions = async () => {
   await delay();
-  return JSON.parse(JSON.stringify(getStoredLiveSession()));
+  return JSON.parse(JSON.stringify(getStoredSessions()));
 };
 
-// 16. joinLiveSession
-export const joinLiveSession = async (bookTitle = 'مقدمة ابن خلدون', user = null) => {
+// 16. createSession
+export const createSession = async ({ title, durationMinutes = 25, bookTitle }, user = null) => {
   await delay();
   if (!user || !user.id) {
     throw new Error('auth_required');
   }
 
-  const session = getStoredLiveSession();
+  const sessions = getStoredSessions();
+  const newSession = {
+    id: `sess-${Date.now()}`,
+    title: (title || 'جلسة قراءة جديدة').trim(),
+    durationMinutes: Number(durationMinutes) || 25,
+    createdAt: new Date().toISOString(),
+    participants: [
+      {
+        id: `p-${Date.now()}`,
+        userId: user.id,
+        userName: user.name,
+        bookTitle: (bookTitle || 'قراءة حرة').trim()
+      }
+    ]
+  };
+
+  sessions.unshift(newSession);
+  safeSet('harf_sessions', sessions);
+  return JSON.parse(JSON.stringify(newSession));
+};
+
+// 17. joinSession
+export const joinSession = async (sessionId, bookTitle = 'قراءة حرة', user = null) => {
+  await delay();
+  if (!user || !user.id) {
+    throw new Error('auth_required');
+  }
+
+  const sessions = getStoredSessions();
+  const session = sessions.find((s) => s.id === sessionId);
+  if (!session) return null;
+
   if (!Array.isArray(session.participants)) {
     session.participants = [];
   }
 
   const existing = session.participants.find((p) => p.userId === user.id);
-  if (!existing) {
+  if (existing) {
+    existing.bookTitle = bookTitle;
+  } else {
     session.participants.unshift({
       id: `p-${Date.now()}`,
       userId: user.id,
       userName: user.name,
       bookTitle
     });
-    safeSet(STORAGE_KEYS.LIVE_SESSION, session);
   }
 
+  safeSet('harf_sessions', sessions);
   return JSON.parse(JSON.stringify(session));
+};
+
+// 18. leaveSession
+export const leaveSession = async (sessionId, user = null) => {
+  await delay();
+  if (!user || !user.id) {
+    return null;
+  }
+
+  const sessions = getStoredSessions();
+  const session = sessions.find((s) => s.id === sessionId);
+  if (!session) return null;
+
+  if (Array.isArray(session.participants)) {
+    session.participants = session.participants.filter((p) => p.userId !== user.id);
+  }
+
+  safeSet('harf_sessions', sessions);
+  return JSON.parse(JSON.stringify(session));
+};
+
+// Backward compatible aliases
+export const getLiveSession = async () => {
+  const sessions = await getSessions();
+  return sessions[0] || INITIAL_SESSIONS[0];
+};
+
+export const joinLiveSession = async (bookTitle = 'مقدمة ابن خلدون', user = null) => {
+  const sessions = getStoredSessions();
+  const firstId = sessions[0]?.id || 'sess-1';
+  return joinSession(firstId, bookTitle, user);
 };

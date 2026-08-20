@@ -171,6 +171,67 @@ button:focus-visible, a:focus-visible, input:focus-visible, textarea:focus-visib
   transform: translateY(-6px);
 }
 
+/* Circular Timer Pulse Glow Animation */
+@keyframes timerPulseGlow {
+  0%, 100% {
+    filter: drop-shadow(0 0 6px rgba(189, 68, 68, 0.3));
+  }
+  50% {
+    filter: drop-shadow(0 0 16px rgba(189, 68, 68, 0.65));
+  }
+}
+
+.timer-pulse-glow {
+  animation: timerPulseGlow 3s ease-in-out infinite;
+}
+
+/* Hero Marquee - Pure, Clean, Reliable Seamless Loop */
+@keyframes marqueeScroll {
+  0% {
+    transform: translateX(0);
+  }
+  100% {
+    transform: translateX(-33.333333%);
+  }
+}
+
+.marquee-container {
+  width: 100%;
+  overflow: hidden;
+  position: relative;
+}
+
+.marquee-row {
+  display: flex;
+  width: max-content;
+  animation: marqueeScroll 40s linear infinite;
+  will-change: transform;
+}
+
+.marquee-row:hover {
+  animation-play-state: paused;
+}
+
+.marquee-card {
+  width: 200px;
+  height: 300px;
+  flex-shrink: 0;
+  margin-left: 12px;
+  margin-right: 12px;
+  border-radius: 16px;
+  overflow: hidden;
+  box-shadow: 0 10px 25px -5px rgba(43, 43, 38, 0.16), 0 8px 10px -6px rgba(43, 43, 38, 0.1);
+  transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.3s ease;
+  cursor: pointer;
+  background-color: #FDF8F0;
+  border: 1px solid rgba(223, 206, 183, 0.85);
+}
+
+.marquee-card:hover {
+  transform: rotate(0deg) translateY(-8px) scale(1.04) !important;
+  box-shadow: 0 22px 35px -10px rgba(43, 43, 38, 0.3);
+}
+
 /* Respect prefers-reduced-motion - disable all motion */
 @media (prefers-reduced-motion: reduce) {
   .hero-ambient-float,
@@ -178,11 +239,21 @@ button:focus-visible, a:focus-visible, input:focus-visible, textarea:focus-visib
   .hero-book-interactive,
   .hero-book-tilt-left,
   .hero-book-tilt-right,
-  .hero-book-tilt-up {
+  .hero-book-tilt-up,
+  .timer-pulse-glow,
+  .marquee-row {
     animation: none !important;
     transition: none !important;
     transform: none !important;
+    filter: none !important;
     opacity: 1 !important;
+  }
+  .marquee-card {
+    transform: none !important;
+    transition: none !important;
+  }
+  .marquee-card:hover {
+    transform: none !important;
   }
 }
 

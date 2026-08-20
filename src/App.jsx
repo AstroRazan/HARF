@@ -12,6 +12,8 @@ import MyLibraryPage from './pages/MyLibraryPage';
 import CommunitiesPage from './pages/CommunitiesPage';
 import { getSessionUser, logout } from './data/store';
 
+import FloatingSessionsWidget from './components/FloatingSessionsWidget';
+
 export default function App() {
   // Navigation view state (no routing library)
   const [view, setView] = useState({ name: 'home' });
@@ -122,17 +124,25 @@ export default function App() {
         )}
       </main>
 
-      {/* 4. Mobile Bottom Navigation Tab Bar */}
+      {/* 4. Floating Sessions Widget (Pinned to bottom-left on every page) */}
+      <FloatingSessionsWidget
+        setView={setView}
+        showToast={showToast}
+        currentUser={currentUser}
+        onOpenAuth={() => setIsAuthOpen(true)}
+      />
+
+      {/* 5. Mobile Bottom Navigation Tab Bar */}
       <BottomNav currentView={view} setView={setView} />
 
-      {/* 5. Auth Modal */}
+      {/* 6. Auth Modal */}
       <AuthModal
         isOpen={isAuthOpen}
         onClose={() => setIsAuthOpen(false)}
         onAuthSuccess={handleAuthSuccess}
       />
 
-      {/* 6. Floating Demo Toast */}
+      {/* 7. Floating Toast */}
       <Toast
         message={toastMessage}
         visible={toastVisible}

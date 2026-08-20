@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { X, User, Lock, Mail, AlertCircle, Loader2 } from 'lucide-react';
 import { login, signup } from '../data/store';
+import harfLogo from '../assets/harf_logo.png';
 
 export default function AuthModal({ isOpen, onClose, onAuthSuccess }) {
   const [tab, setTab] = useState('login'); // 'login' | 'signup'
@@ -61,8 +62,13 @@ export default function AuthModal({ isOpen, onClose, onAuthSuccess }) {
           <X className="w-5 h-5" />
         </button>
 
-        {/* Wordmark and Header */}
-        <div className="text-center mb-6">
+        {/* Wordmark and Header with Logo */}
+        <div className="text-center mb-6 flex flex-col items-center">
+          <img
+            src={harfLogo}
+            alt="حرف"
+            className="h-16 sm:h-20 w-auto object-contain mb-2.5 drop-shadow-xs"
+          />
           <h2 className="text-2xl font-bold logo-text text-[#2B2B26] mb-1">
             حرف
           </h2>

@@ -13,10 +13,10 @@ export default function BookCover({
   const [imgError, setImgError] = useState(false);
 
   const sizeClasses = {
-    sm: 'w-14 h-20 text-[10px] rounded-lg',
-    md: 'w-full aspect-[3/4.2] text-xs rounded-card',
-    lg: 'w-44 md:w-52 aspect-[3/4.3] text-sm rounded-card',
-    xl: 'w-56 md:w-64 aspect-[3/4.3] text-base rounded-card'
+    sm: 'w-14 h-21 aspect-[2/3] text-[10px] rounded-lg',
+    md: 'w-full aspect-[2/3] text-xs rounded-xl',
+    lg: 'w-44 md:w-52 aspect-[2/3] text-sm rounded-card',
+    xl: 'w-56 md:w-64 aspect-[2/3] text-base rounded-card'
   };
 
   const hasValidCover = Boolean(coverUrl) && !imgError;
